@@ -215,19 +215,25 @@ public abstract class AbstractAWSSigner implements Signer {
          * Signing protocol expects the param values also to be sorted after url
          * encoding in addition to sorted parameter names.
          */
-        for (Map.Entry<String, List<String>> entry : parameters.entrySet()) {
-            final String encodedParamName = SdkHttpUtils.urlEncode(
-                    entry.getKey(), false);
-            final List<String> paramValues = entry.getValue();
-            final List<String> encodedValues = new ArrayList<String>(
-                    paramValues.size());
-            for (String value : paramValues) {
-                encodedValues.add(SdkHttpUtils.urlEncode(value, false));
-            }
-            Collections.sort(encodedValues);
-            sorted.put(encodedParamName, encodedValues);
+         try{
+            for (Map.Entry<String, List<String>> entry : parameters.entrySet()) {
+                final String encodedParamName = SdkHttpUtils.urlEncode(
+                        entry.getKey(), false);
+                final List<String> paramValues = entry.getValue();
+                final List<String> encodedValues = new ArrayList<String>(
+                        paramValues.size());
+                for (String value : paramValues) {
+                    encodedValues.add(value==null?"":URLEncoder.encode(value, "UTF-8"));
+                    //encodedValues.add(SdkHttpUtils.urlEncode(value, false));
+                }
+                Collections.sort(encodedValues);
+                sorted.put(encodedParamName, encodedValues);
 
+            }
+        } catch (UnsupportedEncodingException ex) {
+            throw new RuntimeException(ex);
         }
+
 
         final StringBuilder result = new StringBuilder();
         for(Map.Entry<String, List<String>> entry : sorted.entrySet()) {
